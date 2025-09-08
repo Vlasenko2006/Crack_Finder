@@ -15,12 +15,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the trained model
+# Load the trained model
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = models.resnet18(pretrained=False)
 model.fc = nn.Linear(model.fc.in_features, 2)
-model.load_state_dict(torch.load('crack_resnet18.pth', map_location=device))
+checkpoint = torch.load('checkpoints/checkpoint_epoch_3.pth', map_location=device)
+model.load_state_dict(checkpoint['model_state_dict'])
 model = model.to(device)
 model.eval()
+
+# model = models.resnet18(pretrained=False)
+# model.fc = nn.Linear(model.fc.in_features, 2)
+# model.load_state_dict(torch.load('checkpoints/checkpoint_epoch_3.pth', map_location=device))
+# model = model.to(device)
+# model.eval()
 
 # Transformation for patches
 patch_transform = transforms.Compose([
@@ -101,7 +109,7 @@ def grid_image_and_classify(img_path, model, patch_size=(227, 227), threshold=0.
     return crack_patches
 
 # Example usage:
-test_images = ['wall1.jpg', 'wall2.jpg', 'wall3.jpg']
+test_images = ['validate/wall1.jpg', 'validate/wall2.jpg', 'validate/wall3.jpg']
 for img_path in test_images:
     print(f"Processing {img_path}")
     crack_patches = grid_image_and_classify(img_path, model)
