@@ -1,6 +1,8 @@
 # Crack_Finder
 # Concrete Crack Detection with ResNet-18
 
+This is a lightweigted classificator-based neural network for cracks detection. Give it a foto of an inspected object, or even a video, and it will spotify cracks, delivering their locations  
+
 This repository provides a pipeline for training a ResNet-18 neural network to classify concrete surface images as "cracked" or "uncracked". The model uses transfer learning, checkpointing, and a tqdm progress bar for efficient training on your own dataset.
 
 ---
