@@ -93,6 +93,12 @@ def grid_image_and_classify(img_path, model, patch_size=(227, 227), threshold=0.
         if n in crack_patches:
             left, upper, right, lower = coords[i]
             draw_mask.rectangle([left, upper, right, lower], fill=(255, 0, 0, 128))  # semi-transparent red overlay
+           # draw_mask.text((left + 10, upper + 10), str(n), fill="white", font=font)
+       
+    for i, n in enumerate(numbers):
+        if n in crack_patches:
+            left, upper, right, lower = coords[i]
+            draw_mask.text((left + 10, upper + 10), str(n), fill="white", font=font)
     
     # Composite the overlay with the original image
     masked_img = Image.alpha_composite(masked_img, overlay).convert("RGB")
