@@ -21,36 +21,33 @@ patch_transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
+
+
+
 def grid_image_and_classify(img_path, model, patch_size=(227, 227), threshold=0.5):
     img = Image.open(img_path).convert('RGB')
     width, height = img.size
     p_w, p_h = patch_size
 
-    # Compute top-left coordinates for all patches
     xs = list(range(0, width - p_w + 1, p_w))
     ys = list(range(0, height - p_h + 1, p_h))
-
-    # Ensure rightmost column covers right edge
     if xs[-1] + p_w < width:
         xs.append(width - p_w)
-    # Ensure bottom row covers bottom edge
     if ys[-1] + p_h < height:
         ys.append(height - p_h)
 
-    patches = []
-    coords = []
-    numbers = []
+    patches, coords, numbers = [], [], []
     patch_id = 1
 
-    # For drawing grid and numbers
-    img_with_grid = img.copy()
-    draw = ImageDraw.Draw(img_with_grid)
+    # --- СОЗДАЕМ ПРОЗРАЧНЫЙ СЛОЙ ДЛЯ КВАДРАТОВ ---
+    img_with_grid = img.convert('RGBA')
+    overlay = Image.new('RGBA', img_with_grid.size, (0,0,0,0))
+    draw = ImageDraw.Draw(overlay)
     try:
-        font = ImageFont.truetype("arial.ttf", 24)
+        font = ImageFont.truetype("arial.ttf", 64)
     except:
-        font = ImageFont.load_default()
+        font = ImageFont.load_default(64)
 
-    # Extract patches and annotate grid
     for y in ys:
         for x in xs:
             left, upper, right, lower = x, y, x + p_w, y + p_h
@@ -58,12 +55,15 @@ def grid_image_and_classify(img_path, model, patch_size=(227, 227), threshold=0.
             patches.append(patch)
             coords.append((left, upper, right, lower))
             numbers.append(patch_id)
-            # Draw rectangle and patch number
-            draw.rectangle([left, upper, right, lower], outline="red", width=2)
-            draw.text((left + 5, upper + 5), str(patch_id), fill="yellow", font=font)
+
+            draw.rectangle([left, upper, right, lower], outline=(255,0,0,128), width=2)
+            # draw.rectangle([left, upper, right, lower], outline=(255,0,0,128), fill=(255,0,0,40), width=2)
+            draw.text((left + 5, upper + 5), str(patch_id), fill="blue", font=font)
             patch_id += 1
 
-    # Plot image with grid numbers
+
+    img_with_grid = Image.alpha_composite(img_with_grid, overlay).convert('RGB')
+
     plt.figure(figsize=(10, 10))
     plt.imshow(img_with_grid)
     plt.axis('off')
@@ -85,13 +85,18 @@ def grid_image_and_classify(img_path, model, patch_size=(227, 227), threshold=0.
     print(f"Classified crack patch numbers: {crack_patches}")
 
     # Mask out cracked patches
-    masked_img = img.copy()
-    draw_mask = ImageDraw.Draw(masked_img)
+    masked_img = img.convert("RGBA")  # Convert to RGBA
+    overlay = Image.new("RGBA", masked_img.size, (0, 0, 0, 0))  # Transparent overlay
+    draw_mask = ImageDraw.Draw(overlay)
+    
     for i, n in enumerate(numbers):
         if n in crack_patches:
             left, upper, right, lower = coords[i]
             draw_mask.rectangle([left, upper, right, lower], fill=(255, 0, 0, 128))  # semi-transparent red overlay
-
+    
+    # Composite the overlay with the original image
+    masked_img = Image.alpha_composite(masked_img, overlay).convert("RGB")
+    
     # Show masked image
     plt.figure(figsize=(10, 10))
     plt.imshow(masked_img)
@@ -99,7 +104,6 @@ def grid_image_and_classify(img_path, model, patch_size=(227, 227), threshold=0.
     plt.title("Masked Cracked Regions")
     plt.show()
 
-    return crack_patches
 
 # Example usage:
 test_images = ['validate/wall1.jpg', 'validate/wall2.jpg', 'validate/wall3.jpg']
