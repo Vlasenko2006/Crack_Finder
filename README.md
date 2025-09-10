@@ -1,5 +1,6 @@
-# Crack_Finder
 # Concrete Crack Detection with ResNet-18
+
+## Intro 
 
 This is a ResNet-18 neural network trained for crack detection. Give it a foto of an inspected object, or even a video, and it will spotify cracks, delivering their locations (as geojson geographical coordinates). The neural network is trained within 3 epochs on a dataset of crfacks taken from [Kaggle repository](https://www.kaggle.com/datasets/arunrk7/surface-crack-detection), where each sample is a 227x227 image of cracked or uncracked concrete.  
 
@@ -47,13 +48,21 @@ Patch_id 24 coordinates (lat,lon,alt): (53.566077, 9.7315563, 0.1266666666666667
 
 Here is a short video example of spotting cracks on a fly: 
 
-[Crack detection video](https://youtu.be/4QStHUmI6J4)
+<p align="center">
+  <a href="https://youtu.be/4QStHUmI6J4" target="_blank">
+    <img src="https://img.youtube.com/vi/4QStHUmI6J4/0.jpg" alt="Crack detection video" width="480">
+    <br>
+    <strong>Watch Crack detection video</strong>
+  </a>
+</p>
 
 
+## Code structure
 
-This repository provides a pipeline for training a ResNet-18 neural network to classify concrete surface images as "cracked" or "uncracked". The model uses transfer learning, checkpointing, and a tqdm progress bar for efficient training on your own dataset.
-
-
+- **Crack_NN.py** fine tunes pretraied `ResNet-18` for crack detection. The model uses transfer learning, checkpointing, and a tqdm progress bar for efficient training on your own dataset.
+- **Split_dataset.py** splits Kaggle dataset into train and validation sets.
+- **Large_crack_check.py** Grids the input image, masks the cracks with patches, identfying patches' geographical centers.
+- **Large_crack_check_video.py** Grids the input video, masks the cracks with patches on a fly.    
 
 
 
