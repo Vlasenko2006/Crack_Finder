@@ -1,11 +1,21 @@
 # Crack_Finder
 # Concrete Crack Detection with ResNet-18
 
-This is a lightweigted classificator-based neural network for cracks detection. Give it a foto of an inspected object, or even a video, and it will spotify cracks, delivering their locations. Here is a short video example: 
+This is a ResNet-18 neural network trained for crack detection. Give it a foto of an inspected object, or even a video, and it will spotify cracks, delivering their locations (including geographical coordinates). The neural network is trained within 3 epochs on a dataset  of crfacks taken from [Kaggle repository](https://www.kaggle.com/datasets/arunrk7/surface-crack-detection), where each sample is a 227x227 image of cracked or uncracked concrete.  
 
-[Crack detection](https://youtu.be/4QStHUmI6J4)
+
+The detection script uses this neural network to detect cracks. It accepts an image of a given construction, put a grid on it where each cell has the same size as the size of an image from trained dataset (227x227 pixels). It classifies each cell for having or not having cracks and masks the cells classified as cracked. See example below.
+
 
 This repository provides a pipeline for training a ResNet-18 neural network to classify concrete surface images as "cracked" or "uncracked". The model uses transfer learning, checkpointing, and a tqdm progress bar for efficient training on your own dataset.
+
+
+
+
+Here is a short video example: 
+
+[Crack detection video](https://youtu.be/4QStHUmI6J4)
+
 
 ---
 
