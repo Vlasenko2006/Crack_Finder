@@ -1,18 +1,24 @@
 # Concrete Crack Detection with ResNet-18
 
-## Intro 
+## Introduction
 
-This is a ResNet-18 neural network trained for crack detection. Give it a foto of an inspected object, or even a video, and it will spotify cracks, delivering their locations (as geojson geographical coordinates). The neural network is trained within 3 epochs on a dataset of crfacks taken from [Kaggle repository](https://www.kaggle.com/datasets/arunrk7/surface-crack-detection), where each sample is a 227x227 image of cracked or uncracked concrete.  
+This repository provides a complete pipeline for detecting and localizing cracks in concrete using a fine-tuned ResNet-18 neural network. Simply provide a photo or even a video of the inspected surface—the model will detect cracks, highlight their locations, and output their geographical coordinates in GeoJSON format.
 
+The model is trained for 3 epochs on a dataset of cracks from the [Kaggle Surface Crack Detection Dataset](https://www.kaggle.com/datasets/arunrk7/surface-crack-detection), where each sample is a 227x227 pixel image labeled as cracked or uncracked concrete.
 
-The detection script uses this neural network to detect cracks. It accepts an image of a given construction, put a grid on it where each cell has the same size as the size of an image from trained dataset (227x227 pixels). It classifies each cell for having or not having cracks and masks the cells classified as cracked. See example an below:
+## How It Works
 
-### Input image after putting mask on it
+The detection script divides the input image into a grid, where each cell matches the size of the training images (227x227 pixels). Each cell is independently classified as "crack" or "no crack." Detected cracks are masked and indexed, and their centers are mapped from pixel to real-world coordinates using GeoJSON polygon corners.
+
+### Example Workflow
+
+**Input image with grid overlay:**
+
 <p align="center">
-<img src="https://github.com/Vlasenko2006/Crack_Finder/blob/main/Crack_samples/Crack_unclassified1.png" alt="input image" width="50%">
+<img src="https://github.com/Vlasenko2006/Crack_Finder/blob/main/Crack_samples/Crack_unclassified1.png" alt="Input image" width="50%">
 </p>
 
-### Wall coordinates (not real) in Geojson format: 
+**Example wall coordinates (GeoJSON format):**
 ```
 geojson_polygon = {
     "type": "Polygon",
@@ -24,19 +30,18 @@ geojson_polygon = {
         [9.73114, 53.565534, 1],   # close polygon
     ]]
 }
-```  
+```
 
-
-### Spotted and classified cracks
+**Detected and masked cracks:**
 
 <p align="center">
-<img src="https://github.com/Vlasenko2006/Crack_Finder/blob/main/Crack_samples/Cracks_classified1.png" alt="input image" width="50%">
+<img src="https://github.com/Vlasenko2006/Crack_Finder/blob/main/Crack_samples/Cracks_classified1.png" alt="Classified cracks" width="50%">
 </p>
 
-### Spotted crack centers coordinates: 
+**Patch center coordinates of detected cracks:**
 ```
-Patch_id 4 coordinates (lat,lon,alt): (53.565931, 9.731444366666667, 0.8744444444444445)
-Patch_id 7 coordinates (lat,lon,alt): (53.5655905, 9.731183316666666, 0.6222222222222222)
+Patch_id 4  coordinates (lat,lon,alt): (53.565931, 9.731444366666667, 0.8744444444444445)
+Patch_id 7  coordinates (lat,lon,alt): (53.5655905, 9.731183316666666, 0.6222222222222222)
 Patch_id 14 coordinates (lat,lon,alt): (53.565704, 9.731270333333333, 0.37)
 Patch_id 15 coordinates (lat,lon,alt): (53.5658175, 9.73135735, 0.37)
 Patch_id 16 coordinates (lat,lon,alt): (53.565931, 9.731444366666667, 0.37)
@@ -46,7 +51,7 @@ Patch_id 21 coordinates (lat,lon,alt): (53.5658175, 9.73135735, 0.12666666666666
 Patch_id 24 coordinates (lat,lon,alt): (53.566077, 9.7315563, 0.1266666666666667)
 ```
 
-Here is a short video example of spotting cracks on a fly: 
+**Demo: Crack detection in video**
 
 <p align="center">
   <a href="https://youtu.be/4QStHUmI6J4" target="_blank">
@@ -56,38 +61,37 @@ Here is a short video example of spotting cracks on a fly:
   </a>
 </p>
 
+---
 
-## Code structure
+## Code Structure
 
-- **Crack_NN.py** fine tunes pretraied `ResNet-18` for crack detection. The model uses transfer learning, checkpointing, and a tqdm progress bar for efficient training on your own dataset.
-- **Split_dataset.py** splits Kaggle dataset into train and validation sets.
-- **Large_crack_check.py** Grids the input image, masks the cracks with patches, identfying patches' geographical centers.
-- **Large_crack_check_video.py** Grids the input video, masks the cracks with patches on a fly.    
-
-
-
+- **Crack_NN.py** &mdash; Fine-tunes a pretrained `ResNet-18` for crack detection. Employs transfer learning, checkpointing, and tqdm progress visualization.
+- **Split_dataset.py** &mdash; Splits the Kaggle dataset into train and validation sets.
+- **Large_crack_check.py** &mdash; Grids the input image, masks cracks, and outputs patch centers with geographic coordinates.
+- **Large_crack_check_video.py** &mdash; Processes video frame-by-frame, masking cracks in real time.
 
 ---
 
 ## Features
 
-- **Transfer Learning:** Utilizes a pretrained ResNet-18 model.
-- **Custom Dataset Ready:** Designed to work with foldered image datasets (`Positive` and `Negative`).
-- **Automatic Checkpointing:** Saves model and optimizer state at each epoch.
-- **Progress Visualization:** Uses tqdm for real-time progress bars during training.
+- **Transfer Learning:** Utilizes a pretrained ResNet-18 backbone for fast convergence.
+- **Custom Dataset Support:** Expects images organized into `Positive` and `Negative` folders.
+- **Automatic Checkpointing:** Saves model and optimizer states after each epoch.
+- **Progress Visualization:** Uses tqdm for real-time training feedback.
+- **Geo-referencing:** Converts detected crack locations to geographical coordinates using user-provided polygons.
 
 ---
 
 ## Installation
 
-First, create a Python environment (optional but recommended):
+Create and activate a Python virtual environment (optional, but recommended):
 
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-Then install the required packages:
+Install required dependencies:
 
 ```bash
 pip install torch torchvision tqdm
@@ -97,7 +101,7 @@ pip install torch torchvision tqdm
 
 ## Dataset Structure
 
-Your dataset should be organized as follows:
+Organize your dataset as follows:
 
 ```
 data_split/
@@ -117,34 +121,34 @@ data_split/
             ...
 ```
 
-- You can use the provided script or your own method to split your dataset into train/val sets.
+Use the provided script or your own method to split your dataset into train/val sets.
 
 ---
 
 ## Training the Model
 
-Save the training script (e.g., as `train.py`). Then, run:
+Run the training script:
 
 ```bash
-python train.py
+python Crack_NN.py
 ```
 
-Model checkpoints will be saved in the `checkpoints` directory after each epoch. The final trained model weights will be saved as `crack_resnet18.pth`.
+Model checkpoints will be saved in the `checkpoints` directory after each epoch, and the final model weights will be saved as `crack_resnet18.pth`.
 
 ---
 
-## Parameters
+## Key Parameters
 
-- **Batch Size:** 32 (can be changed in the script)
-- **Image Size:** 227x227 pixels (to match reference datasets)
-- **Epochs:** 3 (modify for longer training)
+- **Batch Size:** 32 (modifiable)
+- **Image Size:** 227x227 pixels
+- **Epochs:** 3 (adjust as needed)
 - **Learning Rate:** 0.001 (Adam optimizer)
 
 ---
 
-## Using the Model
+## Inference Usage
 
-After training, you can load the model for inference or further fine-tuning:
+After training, load the model for inference or fine-tuning:
 
 ```python
 import torch
@@ -158,10 +162,11 @@ model.eval()
 
 ---
 
-## Notes
+## Notes & Tips
 
-- For best results, ensure your validation set is representative.
-- If using your own images, adjust the folder paths as needed in the script.
+- For best results, ensure your validation set is representative of your use case.
+- Adjust folder paths and hyperparameters as needed for your dataset.
+- Geographic conversion requires correct GeoJSON polygon input.
 
 ---
 
