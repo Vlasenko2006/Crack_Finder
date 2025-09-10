@@ -1,10 +1,54 @@
 # Crack_Finder
 # Concrete Crack Detection with ResNet-18
 
-This is a ResNet-18 neural network trained for crack detection. Give it a foto of an inspected object, or even a video, and it will spotify cracks, delivering their locations (including geographical coordinates). The neural network is trained within 3 epochs on a dataset  of crfacks taken from [Kaggle repository](https://www.kaggle.com/datasets/arunrk7/surface-crack-detection), where each sample is a 227x227 image of cracked or uncracked concrete.  
+This is a ResNet-18 neural network trained for crack detection. Give it a foto of an inspected object, or even a video, and it will spotify cracks, delivering their locations (as geojson geographical coordinates). The neural network is trained within 3 epochs on a dataset of crfacks taken from [Kaggle repository](https://www.kaggle.com/datasets/arunrk7/surface-crack-detection), where each sample is a 227x227 image of cracked or uncracked concrete.  
 
 
-The detection script uses this neural network to detect cracks. It accepts an image of a given construction, put a grid on it where each cell has the same size as the size of an image from trained dataset (227x227 pixels). It classifies each cell for having or not having cracks and masks the cells classified as cracked. See example below.
+The detection script uses this neural network to detect cracks. It accepts an image of a given construction, put a grid on it where each cell has the same size as the size of an image from trained dataset (227x227 pixels). It classifies each cell for having or not having cracks and masks the cells classified as cracked. See example an below:
+
+### Input image after putting mask on it
+<p align="center">
+<img src="https://github.com/Vlasenko2006/Crack_Finder/blob/main/Crack_samples/Crack_unclassified1.png" alt="input image" width="50%">
+</p>
+
+### Wall coordinates (not real) in Geojson format: 
+```
+geojson_polygon = {
+    "type": "Polygon",
+    "coordinates": [[
+        [9.73114, 53.565534, 1],   # upper-left corner
+        [9.73160, 53.566134, 1],   # upper-right corner
+        [9.73160, 53.566134, 0],   # lower-right corner
+        [9.73114, 53.565534, 0],   # lower-left corner
+        [9.73114, 53.565534, 1],   # close polygon
+    ]]
+}
+```  
+
+
+### Spotted and classified cracks
+
+<p align="center">
+<img src="https://github.com/Vlasenko2006/Crack_Finder/blob/main/Crack_samples/Cracks_classified1.png" alt="input image" width="50%">
+</p>
+
+### Spotted crack centers coordinates: 
+```
+Patch_id 4 coordinates (lat,lon,alt): (53.565931, 9.731444366666667, 0.8744444444444445)
+Patch_id 7 coordinates (lat,lon,alt): (53.5655905, 9.731183316666666, 0.6222222222222222)
+Patch_id 14 coordinates (lat,lon,alt): (53.565704, 9.731270333333333, 0.37)
+Patch_id 15 coordinates (lat,lon,alt): (53.5658175, 9.73135735, 0.37)
+Patch_id 16 coordinates (lat,lon,alt): (53.565931, 9.731444366666667, 0.37)
+Patch_id 17 coordinates (lat,lon,alt): (53.5660445, 9.731531383333333, 0.37)
+Patch_id 18 coordinates (lat,lon,alt): (53.566077, 9.7315563, 0.37)
+Patch_id 21 coordinates (lat,lon,alt): (53.5658175, 9.73135735, 0.1266666666666667)
+Patch_id 24 coordinates (lat,lon,alt): (53.566077, 9.7315563, 0.1266666666666667)
+```
+
+Here is a short video example of spotting cracks on a fly: 
+
+[Crack detection video](https://youtu.be/4QStHUmI6J4)
+
 
 
 This repository provides a pipeline for training a ResNet-18 neural network to classify concrete surface images as "cracked" or "uncracked". The model uses transfer learning, checkpointing, and a tqdm progress bar for efficient training on your own dataset.
@@ -12,9 +56,6 @@ This repository provides a pipeline for training a ResNet-18 neural network to c
 
 
 
-Here is a short video example: 
-
-[Crack detection video](https://youtu.be/4QStHUmI6J4)
 
 
 ---
